@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ランダム単語生成アプリ</title>
+</head>
+<body>
+  <h1>ランダム単語生成アプリ</h1>
+
+  <label>
+    テーマ：
+    <input type="text" id="theme" value="未来">
+  </label>
+
+  <label>
+    生成数：
+    <input type="number" id="count" value="5">
+  </label>
+
+  <button onclick="sendData()">送信</button>
+
+  <script>
+    async function sendData() {
+      const theme = document.getElementById('theme').value;
+      const count = Number(document.getElementById('count').value);
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: theme, count: count })
+      });
+
+      const data = await response.json();
+      console.log(data);
+    }
+  </script>
+</body>
+</html>
