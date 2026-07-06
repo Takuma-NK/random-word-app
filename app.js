@@ -1,4 +1,5 @@
 const express = require('express');
+const pool = require('./db');
 
 const app = express();
 const PORT = 3000;
@@ -7,25 +8,28 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // テーマ一覧取得API
-app.get('/api/themes', (req, res) => {
-  const themes = [
-    { id: 1, name: '未来', description: 'SFや近未来に関するテーマ' },
-    { id: 2, name: '自然', description: '自然や環境に関するテーマ' },
-    { id: 3, name: 'ホラー', description: '恐怖や不気味さに関するテーマ' }
-  ];
+app.get('/api/themes', async (req, res) => {
+  const result = await pool.query(
+    'SELECT DISTINCT theme FROM words ORDER BY theme'
+  );
 
-  res.json(themes);
+  res.json(result.rows);
 });
 
 // 単語生成API
-app.post('/api/generate', (req, res) => {
+app.post('/api/generate', async (req, res) => {
+
   const { theme, count } = req.body;
 
-  const newRequest = { theme, count };
+  console.log({ theme, count });
 
-  console.log('受け取ったデータ:', newRequest);
+  const result = await pool.query(
+    'SELECT word FROM words WHERE theme = $1 ORDER BY RANDOM() LIMIT $2',
+    [theme, count]
+  );
 
-  res.json(newRequest);
+  res.json(result.rows);
+
 });
 
 app.listen(PORT, () => {
