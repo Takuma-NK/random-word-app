@@ -19,6 +19,29 @@
 
   <button onclick="sendData()">送信</button>
 
+<hr>
+
+<h2>単語追加</h2>
+
+<label>
+  テーマ：
+  <input type="text" id="addTheme" value="未来">
+</label>
+
+<label>
+  単語：
+  <input type="text" id="addWord" value="空飛ぶ自動車">
+</label>
+
+<button onclick="addWord()">単語を追加</button>
+
+<button onclick="getWords()">単語一覧を取得</button>
+
+<h2>結果</h2>
+
+<pre id="result"></pre>
+
+
   <script>
     async function sendData() {
       const theme = document.getElementById('theme').value;
@@ -33,6 +56,38 @@
       const data = await response.json();
       console.log(data);
     }
+    async function addWord() {
+      const theme = document.getElementById('addTheme').value;
+      const word = document.getElementById('addWord').value;
+
+      const response = await fetch('/api/words', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      theme,
+      word
+    })
+  });
+
+      const data = await response.json();
+
+      console.log(data);
+
+      document.getElementById('result').textContent =
+      JSON.stringify(data, null, 2);
+}
+    async function getWords() {
+      const response = await fetch('/api/words');
+      const data = await response.json();
+
+    console.log(data);
+
+    document.getElementById('result').textContent =
+    JSON.stringify(data, null, 2);
+}
   </script>
+  
 </body>
 </html>

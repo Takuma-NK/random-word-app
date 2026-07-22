@@ -32,6 +32,54 @@ app.post('/api/generate', async (req, res) => {
 
 });
 
+
+app.post('/api/words', async (req, res) => {
+  try {
+    const { theme, word } = req.body;
+
+    if (!theme || !word) {
+      return res.status(400).json({
+        error: 'themeとwordは必須です'
+      });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO words (theme, word)
+       VALUES ($1, $2)
+       RETURNING id, theme, word, created_at`,
+      [theme, word]
+    );
+
+    console.log('追加したデータ:', result.rows[0]);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: '単語の追加に失敗しました'
+    });
+  }
+  
+});
+
+// 単語一覧取得API
+app.get('/api/words', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, theme, word, created_at FROM words ORDER BY id'
+    );
+
+    res.json(result.rows);
+
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: '単語一覧の取得に失敗しました'
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:3000`);
 });
