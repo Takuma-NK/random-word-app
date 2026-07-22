@@ -17,7 +17,8 @@
     <input type="number" id="count" value="5">
   </label>
 
-  <button onclick="sendData()">送信</button>
+<button onclick="sendData()">送信</button>
+<button onclick="getThemes()">テーマ一覧を取得</button>
 
 <hr>
 
@@ -43,19 +44,39 @@
 
 
   <script>
-    async function sendData() {
-      const theme = document.getElementById('theme').value;
-      const count = Number(document.getElementById('count').value);
+  async function sendData() {
+  const theme = document.getElementById('theme').value;
+  const count = Number(document.getElementById('count').value);
 
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: theme, count: count })
-      });
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ theme, count })
+  });
 
-      const data = await response.json();
-      console.log(data);
-    }
+  const data = await response.json();
+
+  console.log(data);
+
+  // 結果欄を空にする
+  const result = document.getElementById('result');
+  result.innerHTML = '';
+
+  // 単語を画面に表示
+  if (data.length === 0) {
+    result.textContent = '該当する単語がありません。';
+    return;
+  }
+
+  data.forEach(item => {
+    const p = document.createElement('p');
+    p.textContent = item.word;
+    result.appendChild(p);
+  });
+}
+
     async function addWord() {
       const theme = document.getElementById('addTheme').value;
       const word = document.getElementById('addWord').value;
@@ -85,6 +106,16 @@
     console.log(data);
 
     document.getElementById('result').textContent =
+    JSON.stringify(data, null, 2);
+}
+
+async function getThemes() {
+  const response = await fetch('/api/themes');
+  const data = await response.json();
+
+  console.log(data);
+
+  document.getElementById('result').textContent =
     JSON.stringify(data, null, 2);
 }
   </script>
